@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import colors from "../constants/colors";
+
+const { width, height } = Dimensions.get('window');
 
 const HomeScreen = () => {
     const [salario, setSalario] = useState("");
@@ -12,7 +13,7 @@ const HomeScreen = () => {
 
     const agregarGasto = () => {
         if (!nombreGasto || !montoGasto) return;
-
+        
         const nuevoGasto = {
             id: Math.random().toString(),
             nombre: nombreGasto,
@@ -40,111 +41,155 @@ const HomeScreen = () => {
         }).format(amount);
     };
 
-    return (
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-            <LinearGradient colors={colors.gradientePrimario} style={styles.header}>
-                <View style={styles.headerTop}>
-                    <View>
-                        <Text style={styles.greeting}>Resumen Financiero 👋</Text>
-                        <Text style={styles.subtitle}>Gestiona y calcula tu presupuesto</Text>
-                    </View>
-                    <View style={styles.profileIcon}>
-                        <Ionicons name="wallet" size={24} color={colors.principal} />
-                    </View>
-                </View>
-
-                <View style={styles.balanceContainer}>
-                    <Text style={styles.balanceLabel}>Disponible / Restante</Text>
-                    <Text style={styles.balanceAmount}>{formatCurrency(presupuestoRestante)}</Text>
-                </View>
-            </LinearGradient>
-
-            <View style={styles.content}>
-                <Text style={styles.sectionTitle}>Tu Salario</Text>
-                <View style={styles.inputContainer}>
-                    <Ionicons name="cash-outline" size={24} color={colors.principal} style={styles.inputIcon} />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Ingresa tu salario"
-                        keyboardType="numeric"
-                        value={salario}
-                        onChangeText={setSalario}
-                    />
-                </View>
-
-                <View style={styles.statsContainer}>
-                    <View style={styles.statCard}>
-                        <View style={[styles.iconContainer, { backgroundColor: 'rgba(77, 255, 77, 0.1)' }]}>
-                            <Ionicons name="arrow-down" size={24} color={colors.exito} />
-                        </View>
-                        <Text style={styles.statLabel}>Ingresos</Text>
-                        <Text style={[styles.statValue, { color: colors.exito }]}>{formatCurrency(salarioNum)}</Text>
-                    </View>
-
-                    <View style={styles.statCard}>
-                        <View style={[styles.iconContainer, { backgroundColor: 'rgba(255, 77, 77, 0.1)' }]}>
-                            <Ionicons name="arrow-up" size={24} color={colors.alerta} />
-                        </View>
-                        <Text style={styles.statLabel}>Total Gastos</Text>
-                        <Text style={[styles.statValue, { color: colors.alerta }]}>{formatCurrency(totalGastos)}</Text>
-                    </View>
-                </View>
-
-                <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Agregar Gasto</Text>
-                <View style={styles.addExpenseContainer}>
-                    <TextInput
-                        style={[styles.input, styles.expenseInput]}
-                        placeholder="Descripción"
-                        value={nombreGasto}
-                        onChangeText={setNombreGasto}
-                    />
-                    <TextInput
-                        style={[styles.input, styles.expenseInput, { marginLeft: 10, flex: 0.5 }]}
-                        placeholder="Monto"
-                        keyboardType="numeric"
-                        value={montoGasto}
-                        onChangeText={setMontoGasto}
-                    />
-                    <TouchableOpacity style={styles.addButton} onPress={agregarGasto}>
-                        <Ionicons name="add" size={24} color={colors.iluminado} />
-                    </TouchableOpacity>
-                </View>
-
-                <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Lista de Gastos</Text>
-                {gastos.length === 0 ? (
-                    <Text style={styles.emptyText}>No has agregado gastos aún.</Text>
-                ) : (
-                    gastos.map((gasto) => (
-                        <View key={gasto.id} style={styles.activityCard}>
-                            <View style={[styles.activityIcon, { backgroundColor: 'rgba(255, 77, 77, 0.1)', padding: 10, borderRadius: 12 }]}>
-                                <Ionicons name="cart" size={20} color={colors.alerta} />
-                            </View>
-                            <View style={styles.activityDetails}>
-                                <Text style={styles.activityTitle}>{gasto.nombre}</Text>
-                            </View>
-                            <Text style={styles.expenseAmount}>{formatCurrency(gasto.monto)}</Text>
-                            <TouchableOpacity onPress={() => eliminarGasto(gasto.id)} style={{ marginLeft: 10, padding: 5 }}>
-                                <Ionicons name="trash-outline" size={24} color={colors.subtitilo} />
-                            </TouchableOpacity>
-                        </View>
-                    ))
-                )}
+    const renderBackgroundEmojis = () => {
+        return (
+            <View style={styles.emojiBackgroundContainer} pointerEvents="none">
+                <Text style={[styles.backgroundEmoji, { top: height * 0.05, left: width * 0.05, transform: [{ rotate: '-15deg'}] }]}>💸</Text>
+                <Text style={[styles.backgroundEmoji, { top: height * 0.25, left: width * 0.75, transform: [{ rotate: '20deg'}] }]}>💰</Text>
+                <Text style={[styles.backgroundEmoji, { top: height * 0.5, left: width * 0.1, transform: [{ rotate: '10deg'}], fontSize: 100 }]}>🤑</Text>
+                <Text style={[styles.backgroundEmoji, { top: height * 0.7, left: width * 0.65, transform: [{ rotate: '-25deg'}] }]}>💵</Text>
+                <Text style={[styles.backgroundEmoji, { top: height * 0.85, left: width * 0.2, transform: [{ rotate: '5deg'}] }]}>🪙</Text>
             </View>
-        </ScrollView>
+        );
+    };
+
+    return (
+        <View style={styles.mainContainer}>
+            {renderBackgroundEmojis()}
+            
+            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+                <LinearGradient colors={['#1a2a6c', '#11998e', '#38ef7d']} start={{x: 0, y: 0}} end={{x: 1, y: 1}} style={styles.header}>
+                    <View style={styles.headerTop}>
+                        <View>
+                            <Text style={styles.greeting}>Finanzas Top 👋</Text>
+                            <Text style={styles.subtitle}>Tu dinero, bajo control</Text>
+                        </View>
+                        <View style={styles.profileIcon}>
+                            <Ionicons name="wallet-outline" size={28} color="#1a2a6c" />
+                        </View>
+                    </View>
+                    
+                    <View style={styles.balanceWrapper}>
+                        <Text style={styles.balanceLabel}>SALDO DISPONIBLE</Text>
+                        <Text style={styles.balanceAmount}>{formatCurrency(presupuestoRestante)}</Text>
+                    </View>
+                </LinearGradient>
+
+                <View style={styles.content}>
+                    <Text style={styles.sectionTitle}>💰 Ingresos Mensuales</Text>
+                    <View style={styles.glassCard}>
+                        <View style={styles.inputRow}>
+                            <Ionicons name="cash" size={28} color="#11998e" style={styles.inputIcon} />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Ej: 2000000"
+                                placeholderTextColor="rgba(0,0,0,0.4)"
+                                keyboardType="numeric"
+                                value={salario}
+                                onChangeText={setSalario}
+                            />
+                        </View>
+                    </View>
+
+                    <View style={styles.statsContainer}>
+                        <LinearGradient colors={['#dce35b', '#45b649']} style={styles.statCardGlass} start={{x: 0, y: 0}} end={{x: 1, y: 1}}>
+                            <View style={styles.iconContainerWhite}>
+                                <Ionicons name="trending-up" size={24} color="#45b649" />
+                            </View>
+                            <Text style={styles.statLabelLight}>Ingresos</Text>
+                            <Text style={styles.statValueLight} numberOfLines={1}>{formatCurrency(salarioNum)}</Text>
+                        </LinearGradient>
+
+                        <LinearGradient colors={['#ff9966', '#ff5e62']} style={styles.statCardGlass} start={{x: 0, y: 0}} end={{x: 1, y: 1}}>
+                            <View style={styles.iconContainerWhite}>
+                                <Ionicons name="trending-down" size={24} color="#ff5e62" />
+                            </View>
+                            <Text style={styles.statLabelLight}>Gastos</Text>
+                            <Text style={styles.statValueLight} numberOfLines={1}>{formatCurrency(totalGastos)}</Text>
+                        </LinearGradient>
+                    </View>
+
+                    <Text style={styles.sectionTitle}>🛒 Registrar Gasto</Text>
+                    <View style={[styles.glassCard, styles.addExpenseContainer]}>
+                        <TextInput
+                            style={[styles.inputClear, { flex: 1.5 }]}
+                            placeholder="¿Qué compraste?"
+                            placeholderTextColor="rgba(0,0,0,0.4)"
+                            value={nombreGasto}
+                            onChangeText={setNombreGasto}
+                        />
+                        <View style={styles.divider} />
+                        <TextInput
+                            style={[styles.inputClear, { flex: 1 }]}
+                            placeholder="$$$"
+                            placeholderTextColor="rgba(0,0,0,0.4)"
+                            keyboardType="numeric"
+                            value={montoGasto}
+                            onChangeText={setMontoGasto}
+                        />
+                        <TouchableOpacity style={styles.actionBtn} onPress={agregarGasto}>
+                            <Ionicons name="add-circle" size={44} color="#ff5e62" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <Text style={styles.sectionTitle}>🧾 Historial de Gastos</Text>
+                    {gastos.length === 0 ? (
+                        <View style={styles.emptyState}>
+                            <Text style={{fontSize: 40, marginBottom: 10}}>✨</Text>
+                            <Text style={styles.emptyText}>¡Súper! Aún no tienes gastos.</Text>
+                        </View>
+                    ) : (
+                        gastos.map((gasto) => (
+                            <View key={gasto.id} style={styles.expenseItemGlass}>
+                                <View style={styles.expenseIconWrap}>
+                                    <Ionicons name="receipt" size={24} color="#ff5e62" />
+                                </View>
+                                <View style={styles.activityDetails}>
+                                    <Text style={styles.activityTitle}>{gasto.nombre}</Text>
+                                    <Text style={styles.expenseAmountText}>{formatCurrency(gasto.monto)}</Text>
+                                </View>
+                                <TouchableOpacity onPress={() => eliminarGasto(gasto.id)} style={styles.deleteBtn}>
+                                    <Ionicons name="trash" size={22} color="#ff5e62" />
+                                </TouchableOpacity>
+                            </View>
+                        ))
+                    )}
+                </View>
+            </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+        backgroundColor: '#f4f6f9',
+    },
+    emojiBackgroundContainer: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+    },
+    backgroundEmoji: {
+        position: 'absolute',
+        fontSize: 70,
+        opacity: 0.15, // baja opacidad para que no interrumpa el diseño
+    },
     container: {
         flex: 1,
-        backgroundColor: colors.fondloClaro,
     },
     header: {
-        paddingTop: 60,
-        paddingBottom: 30,
-        paddingHorizontal: 20,
-        borderBottomLeftRadius: 30,
-        borderBottomRightRadius: 30,
+        paddingTop: 65,
+        paddingBottom: 35,
+        paddingHorizontal: 25,
+        borderBottomLeftRadius: 40,
+        borderBottomRightRadius: 40,
+        shadowColor: "#11998e",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+        elevation: 10,
     },
     headerTop: {
         flexDirection: 'row',
@@ -152,60 +197,84 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     greeting: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: colors.iluminado,
+        fontSize: 30,
+        fontWeight: '900',
+        color: '#ffffff',
+        letterSpacing: 0.5,
     },
     subtitle: {
-        fontSize: 14,
-        color: 'rgba(255, 255, 255, 0.8)',
+        fontSize: 15,
+        color: 'rgba(255, 255, 255, 0.9)',
         marginTop: 5,
+        fontWeight: '500',
     },
     profileIcon: {
-        width: 50,
-        height: 50,
-        backgroundColor: colors.iluminado,
-        borderRadius: 25,
+        width: 55,
+        height: 55,
+        backgroundColor: '#ffffff',
+        borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        elevation: 5,
     },
-    balanceContainer: {
-        marginTop: 30,
+    balanceWrapper: {
+        marginTop: 35,
         alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        paddingVertical: 20,
+        borderRadius: 25,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.3)',
     },
     balanceLabel: {
-        fontSize: 16,
-        color: 'rgba(255, 255, 255, 0.8)',
+        fontSize: 13,
+        color: '#ffffff',
+        fontWeight: '800',
+        letterSpacing: 2,
+        opacity: 0.9,
     },
     balanceAmount: {
-        fontSize: 36,
-        fontWeight: 'bold',
-        color: colors.iluminado,
+        fontSize: 40,
+        fontWeight: '900',
+        color: '#ffffff',
         marginTop: 5,
+        textShadowColor: 'rgba(0,0,0,0.1)',
+        textShadowOffset: {width: 0, height: 2},
+        textShadowRadius: 4,
     },
     content: {
         padding: 20,
         paddingBottom: 100,
     },
     sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: colors.oscuro,
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#2c3e50',
         marginBottom: 15,
+        marginTop: 10,
     },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.iluminado,
-        borderRadius: 15,
-        paddingHorizontal: 15,
-        paddingVertical: 5,
+    glassCard: {
+        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+        borderRadius: 20,
+        padding: 5,
         marginBottom: 20,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        elevation: 3,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.08,
+        shadowRadius: 15,
+        elevation: 5,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,1)',
+    },
+    inputRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
     },
     inputIcon: {
         marginRight: 10,
@@ -213,107 +282,124 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         height: 50,
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#2c3e50',
+    },
+    inputClear: {
+        height: 50,
         fontSize: 16,
-        color: colors.oscuro,
+        fontWeight: '600',
+        color: '#2c3e50',
+        paddingHorizontal: 10,
     },
     statsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 20,
+        marginBottom: 25,
     },
-    statCard: {
+    statCardGlass: {
         width: '48%',
-        backgroundColor: colors.iluminado,
-        borderRadius: 20,
-        padding: 15,
-        alignItems: 'center',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        elevation: 3,
-    },
-    iconContainer: {
-        width: 50,
-        height: 50,
         borderRadius: 25,
+        padding: 20,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.15,
+        shadowRadius: 15,
+        elevation: 6,
+    },
+    iconContainerWhite: {
+        width: 45,
+        height: 45,
+        backgroundColor: '#ffffff',
+        borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 15,
     },
-    statLabel: {
-        fontSize: 14,
-        color: colors.subtitilo,
+    statLabelLight: {
+        fontSize: 15,
+        color: '#ffffff',
+        fontWeight: '600',
+        opacity: 0.9,
         marginBottom: 5,
     },
-    statValue: {
-        fontSize: 18,
-        fontWeight: 'bold',
+    statValueLight: {
+        fontSize: 19,
+        fontWeight: '900',
+        color: '#ffffff',
     },
     addExpenseContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 10,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
     },
-    expenseInput: {
-        backgroundColor: colors.iluminado,
-        borderRadius: 15,
-        paddingHorizontal: 15,
+    divider: {
+        width: 1,
+        height: 30,
+        backgroundColor: 'rgba(0,0,0,0.1)',
+        marginHorizontal: 10,
+    },
+    actionBtn: {
+        marginLeft: 5,
+    },
+    expenseItemGlass: {
+        flexDirection: 'row',
+        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+        padding: 15,
+        borderRadius: 20,
+        alignItems: 'center',
+        marginBottom: 12,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 5 },
         shadowOpacity: 0.05,
         shadowRadius: 10,
         elevation: 3,
-        flex: 1,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,1)',
     },
-    addButton: {
-        backgroundColor: colors.principal,
-        height: 50,
+    expenseIconWrap: {
         width: 50,
+        height: 50,
+        backgroundColor: 'rgba(255, 94, 98, 0.15)',
         borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 10,
-        shadowColor: colors.principal,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 5,
-    },
-    activityCard: {
-        flexDirection: 'row',
-        backgroundColor: colors.iluminado,
-        padding: 15,
-        borderRadius: 15,
-        alignItems: 'center',
-        marginBottom: 10,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        elevation: 3,
-    },
-    activityIcon: {
         marginRight: 15,
     },
     activityDetails: {
         flex: 1,
     },
     activityTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: colors.oscuro,
+        fontSize: 17,
+        fontWeight: '700',
+        color: '#2c3e50',
+        marginBottom: 4,
     },
-    expenseAmount: {
+    expenseAmountText: {
         fontSize: 16,
-        fontWeight: 'bold',
-        color: colors.alerta,
+        fontWeight: '800',
+        color: '#ff5e62',
+    },
+    deleteBtn: {
+        padding: 10,
+        backgroundColor: 'rgba(255, 94, 98, 0.1)',
+        borderRadius: 12,
+        marginLeft: 10,
+    },
+    emptyState: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 40,
+        backgroundColor: 'rgba(255, 255, 255, 0.6)',
+        borderRadius: 20,
+        marginTop: 10,
     },
     emptyText: {
-        textAlign: 'center',
-        color: colors.subtitilo,
-        marginTop: 10,
-        fontStyle: 'italic',
+        fontSize: 16,
+        color: '#7f8c8d',
+        fontWeight: '600',
     }
 });
 
