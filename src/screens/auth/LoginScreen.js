@@ -28,8 +28,8 @@ const LoginScreen = () => {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             
-            Alert.alert('Éxito', 'Inicio de sesión exitoso', [
-                { text: 'OK', onPress: () => navigation.reset({
+            Alert.alert('🚀 ¡De Vuelta!', '¡Qué bueno verte por aquí otra vez!', [
+                { text: '¡A darle!', onPress: () => navigation.reset({
                     index: 0,
                     routes: [{ name: 'Main' }],
                 }) }
