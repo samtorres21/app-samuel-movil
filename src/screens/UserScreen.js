@@ -1,15 +1,43 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { auth, signOut } from "../services/firebaseService";
+import { selectAndUploadImage } from "../services/cloudinaryService";
+import { updateUserProfilePhoto } from "../services/userService";
 
 const UserScreen = () => {
     // Current user data from Firebase, or defaults if not available
     const user = auth.currentUser;
     const userName = user?.displayName || "Usuario Prueba";
     const userEmail = user?.email || "usuario@ejemplo.com";
+
+    const [profileImage, setProfileImage] = useState(user?.photoURL || null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const handleUpdatePhoto = async () => {
+        if (!user) {
+            Alert.alert("Error", "Debes iniciar sesión para actualizar tu foto.");
+            return;
+        }
+
+        try {
+            setIsUploading(true);
+            const imageUrl = await selectAndUploadImage();
+
+            if (imageUrl) {
+                await updateUserProfilePhoto(user.uid, imageUrl);
+                setProfileImage(imageUrl);
+                Alert.alert("Éxito", "Foto de perfil actualizada correctamente.");
+            }
+        } catch (error) {
+            console.error("Error al actualizar la foto:", error);
+            Alert.alert("Error", "No se pudo actualizar la foto de perfil.");
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     const handleLogout = async () => {
         try {
@@ -22,9 +50,20 @@ const UserScreen = () => {
     return (
         <ScrollView style={styles.container}>
             <LinearGradient colors={colors.gradienteSecundario} style={styles.headerBackground}>
-                <View style={styles.profileImageContainer}>
-                    <Ionicons name="person" size={60} color={colors.suave} />
-                </View>
+                <TouchableOpacity onPress={handleUpdatePhoto} disabled={isUploading}>
+                    <View style={styles.profileImageContainer}>
+                        {profileImage ? (
+                            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+                        ) : (
+                            <Ionicons name="person" size={60} color={colors.suave} />
+                        )}
+                        {isUploading && (
+                            <View style={styles.loadingOverlay}>
+                                <ActivityIndicator size="large" color={colors.iluminado} />
+                            </View>
+                        )}
+                    </View>
+                </TouchableOpacity>
                 <Text style={styles.userName}>{userName}</Text>
                 <Text style={styles.userEmail}>{userEmail}</Text>
             </LinearGradient>
@@ -83,6 +122,17 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         borderWidth: 3,
         borderColor: colors.iluminado,
+        overflow: 'hidden',
+    },
+    profileImage: {
+        width: '100%',
+        height: '100%',
+    },
+    loadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     userName: {
         fontSize: 24,
