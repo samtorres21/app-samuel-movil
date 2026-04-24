@@ -119,6 +119,10 @@ Una vez que Cloudinary aloja la imagen, se conecta con los servicios de Google F
 ---
 <img width="738" height="1600" alt="movil6" src="https://github.com/user-attachments/assets/ed12cc55-5313-4e38-8bc2-23de2bde0494" />
 
+---
+ <img width="1423" height="422" alt="movil7" src="https://github.com/user-attachments/assets/2354b5bb-4585-449c-ba2e-ea905ca6a932" />
+
+
 
 
 
