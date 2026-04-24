@@ -97,6 +97,29 @@
 - Datos cifrados
 - Autenticación segura
 - Posible uso de biometría
+---
+##  Avance: Gestión del Perfil y de Imágenes
+
+En este avance se implementó con éxito la funcionalidad completa para la personalización del perfil de usuario, integrando la selección de imágenes locales, alojamiento en la nube y persistencia de datos con Firebase.
+
+### 1. Gestión de Imagen con Cloudinary 
+Se configuró un flujo optimizado para manejar las imágenes sin saturar la base de datos:
+- **Selección de Imagen:** Se implementó `expo-image-picker` para permitir al usuario abrir la galería de su dispositivo de forma nativa y segura.
+- **Subida a Cloudinary:** Las imágenes se envían a Cloudinary usando un *Upload Preset* en modo `unsigned` (sin firma), lo que permite cargas directas desde el cliente móvil.
+- **Optimización:** Cloudinary se encarga de servir las imágenes de manera rápida y en el formato óptimo, devolviendo una URL segura (`secure_url`) para ser consumida por la aplicación.
+
+### 2. Gestión del Perfil con Firebase 
+Una vez que Cloudinary aloja la imagen, se conecta con los servicios de Google Firebase para hacer el cambio permanente:
+- **Firebase Authentication:** Se utiliza el método `updateProfile` para actualizar la propiedad `photoURL` del usuario autenticado en la sesión actual.
+- **Cloud Firestore:** Paralelamente, se almacena o actualiza la URL en el documento del usuario (dentro de la colección `users`), lo que garantiza que la información esté disponible para ser consultada globalmente en la app.
+
+### 3. Experiencia de Usuario (UI/UX) 📱
+- Se añadió un estado de carga (`isUploading`) que muestra un `ActivityIndicator` superpuesto en la foto mientras la imagen se sube a la nube.
+- La pantalla (`UserScreen`) reacciona y se actualiza inmediatamente una vez que Cloudinary y Firebase responden de manera exitosa, mejorando la percepción de fluidez de la aplicación.
+---
+<img width="738" height="1600" alt="movil6" src="https://github.com/user-attachments/assets/ed12cc55-5313-4e38-8bc2-23de2bde0494" />
+
+
 
 
 
