@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import sqliteService from "../services/sqliteService";
 
 const { width, height } = Dimensions.get('window');
 
@@ -11,21 +12,44 @@ const HomeScreen = () => {
     const [nombreGasto, setNombreGasto] = useState("");
     const [montoGasto, setMontoGasto] = useState("");
 
-    const agregarGasto = () => {
+    useEffect(() => {
+        const cargarDatos = async () => {
+            const salarioGuardado = await sqliteService.obtenerSalario();
+            if (salarioGuardado > 0) {
+                setSalario(salarioGuardado.toString());
+            }
+
+            const gastosGuardados = await sqliteService.obtenerGastos();
+            setGastos(gastosGuardados);
+        };
+        cargarDatos();
+    }, []);
+
+    const handleSalarioChange = async (text) => {
+        setSalario(text);
+        const monto = parseFloat(text) || 0;
+        await sqliteService.guardarSalario(monto);
+    };
+
+    const agregarGasto = async () => {
         if (!nombreGasto || !montoGasto) return;
         
+        const monto = parseFloat(montoGasto) || 0;
+        const idGenerado = await sqliteService.agregarGasto(nombreGasto, monto);
+
         const nuevoGasto = {
-            id: Math.random().toString(),
+            id: idGenerado,
             nombre: nombreGasto,
-            monto: parseFloat(montoGasto) || 0
+            monto: monto
         };
 
-        setGastos([...gastos, nuevoGasto]);
+        setGastos([nuevoGasto, ...gastos]);
         setNombreGasto("");
         setMontoGasto("");
     };
 
-    const eliminarGasto = (id) => {
+    const eliminarGasto = async (id) => {
+        await sqliteService.eliminarGasto(id);
         setGastos(gastos.filter(gasto => gasto.id !== id));
     };
 
@@ -86,7 +110,7 @@ const HomeScreen = () => {
                                 placeholderTextColor="rgba(0,0,0,0.4)"
                                 keyboardType="numeric"
                                 value={salario}
-                                onChangeText={setSalario}
+                                onChangeText={handleSalarioChange}
                             />
                         </View>
                     </View>

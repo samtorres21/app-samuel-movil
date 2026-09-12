@@ -19,7 +19,7 @@ export const pickImage = async () => {
         if (!hasPermission) return null;
 
         const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ['images'],
             allowsEditing: true,
             quality: 0.7,
             aspect: [1, 1],
